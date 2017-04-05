@@ -2,7 +2,7 @@
 #include <cp3_llbb/Framework/interface/ElectronsProducer.h>
 #include <cp3_llbb/Framework/interface/HLTProducer.h>
 
-#include <cp3_llbb/HHAnalysis/interface/Categories.h>
+#include <cp3_llbb/HtoZAAnalysis/interface/Categories.h>
 
 #include <regex>
 
@@ -14,19 +14,19 @@ static std::regex s_mumu_hlt_regex("^HLT_Mu.*_(Tk)?Mu");
 static std::regex s_elel_hlt_regex("^HLT_Ele.*_Ele");
 static std::regex s_muel_elmu_hlt_regex("^HLT_Mu.*_Ele");
 
-const std::vector<HH::Lepton>& DileptonCategory::getLeptons(const AnalyzersManager& analyzers) const {
-    const HHAnalyzer& hh_analyzer = analyzers.get<HHAnalyzer>(m_analyzer_name);
-    return hh_analyzer.leptons;
+const std::vector<HtoZA::Lepton>& DileptonCategory::getLeptons(const AnalyzersManager& analyzers) const {
+    const HtoZAAnalyzer& hZA_analyzer = analyzers.get<HtoZAAnalyzer>(m_analyzer_name);
+    return hZA_analyzer.leptons;
 }
 
-const std::vector<HH::Dilepton>& DileptonCategory::getDileptons(const AnalyzersManager& analyzers) const {
-    const HHAnalyzer& hh_analyzer = analyzers.get<HHAnalyzer>(m_analyzer_name);
-    return hh_analyzer.ll;
+const std::vector<HtoZA::Dilepton>& DileptonCategory::getDileptons(const AnalyzersManager& analyzers) const {
+    const HtoZAAnalyzer& hZA_analyzer = analyzers.get<HtoZAAnalyzer>(m_analyzer_name);
+    return hZA_analyzer.ll;
 }
 
-const std::vector<HH::DileptonMetDijet>& DileptonCategory::getDileptonMetDijets(const AnalyzersManager& analyzers) const {
-    const HHAnalyzer& hh_analyzer = analyzers.get<HHAnalyzer>(m_analyzer_name);
-    return hh_analyzer.llmetjj;
+const std::vector<HtoZA::DileptonDijet>& DileptonCategory::getDileptonDijets(const AnalyzersManager& analyzers) const {
+    const HtoZAAnalyzer& hZA_analyzer = analyzers.get<HtoZAAnalyzer>(m_analyzer_name);
+    return hZA_analyzer.lljj;
 }
 
 // ***** ***** *****
@@ -46,14 +46,14 @@ bool MuMuCategory::event_in_category_pre_analyzers(const ProducersManager& produ
 };
 
 bool MuMuCategory::event_in_category_post_analyzers(const ProducersManager& producers, const AnalyzersManager& analyzers) const {
-    const std::vector<HH::Lepton>& leptons = getLeptons(analyzers);
-    const std::vector<HH::Dilepton>& ll = getDileptons(analyzers);
-    const std::vector<HH::DileptonMetDijet>& llmetjj = getDileptonMetDijets(analyzers);
+    const std::vector<HtoZA::Lepton>& leptons = getLeptons(analyzers);
+    const std::vector<HtoZA::Dilepton>& ll = getDileptons(analyzers);
+    const std::vector<HtoZA::DileptonDijet>& lljj = getDileptonDijets(analyzers);
 
     if (ll.empty())
         return false;
 
-    if (llmetjj.empty())
+    if (lljj.empty())
         return false;
 
     // Only look at the first dilepton pair
@@ -93,14 +93,14 @@ bool ElElCategory::event_in_category_pre_analyzers(const ProducersManager& produ
 };
 
 bool ElElCategory::event_in_category_post_analyzers(const ProducersManager& producers, const AnalyzersManager& analyzers) const {
-    const std::vector<HH::Lepton>& leptons = getLeptons(analyzers);
-    const std::vector<HH::Dilepton>& ll = getDileptons(analyzers);
-    const std::vector<HH::DileptonMetDijet>& llmetjj = getDileptonMetDijets(analyzers);
+    const std::vector<HtoZA::Lepton>& leptons = getLeptons(analyzers);
+    const std::vector<HtoZA::Dilepton>& ll = getDileptons(analyzers);
+    const std::vector<HtoZA::DileptonDijet>& lljj = getDileptonDijets(analyzers);
 
     if (ll.empty())
         return false;
 
-    if (llmetjj.empty())
+    if (lljj.empty())
         return false;
 
     // Only look at the first dilepton pair
@@ -123,6 +123,8 @@ void ElElCategory::evaluate_cuts_post_analyzers(CutManager& manager, const Produ
     }
 }
 
+
+/*
 // ***** ***** *****
 // Dilepton El-Mu category
 // ***** ***** *****
@@ -141,9 +143,9 @@ bool ElMuCategory::event_in_category_pre_analyzers(const ProducersManager& produ
 };
 
 bool ElMuCategory::event_in_category_post_analyzers(const ProducersManager& producers, const AnalyzersManager& analyzers) const {
-    const std::vector<HH::Lepton>& leptons = getLeptons(analyzers);
-    const std::vector<HH::Dilepton>& ll = getDileptons(analyzers);
-    const std::vector<HH::DileptonMetDijet>& llmetjj = getDileptonMetDijets(analyzers);
+    const std::vector<HtoZA::Lepton>& leptons = getLeptons(analyzers);
+    const std::vector<HtoZA::Dilepton>& ll = getDileptons(analyzers);
+    const std::vector<HtoZA::DileptonMetDijet>& llmetjj = getDileptonMetDijets(analyzers);
 
     if (ll.empty())
         return false;
@@ -189,9 +191,9 @@ bool MuElCategory::event_in_category_pre_analyzers(const ProducersManager& produ
 };
 
 bool MuElCategory::event_in_category_post_analyzers(const ProducersManager& producers, const AnalyzersManager& analyzers) const {
-    const std::vector<HH::Lepton>& leptons = getLeptons(analyzers);
-    const std::vector<HH::Dilepton>& ll = getDileptons(analyzers);
-    const std::vector<HH::DileptonMetDijet>& llmetjj = getDileptonMetDijets(analyzers);
+    const std::vector<HtoZA::Lepton>& leptons = getLeptons(analyzers);
+    const std::vector<HtoZA::Dilepton>& ll = getDileptons(analyzers);
+    const std::vector<HtoZA::DileptonMetDijet>& llmetjj = getDileptonMetDijets(analyzers);
 
     if (ll.empty())
         return false;
@@ -218,3 +220,4 @@ void MuElCategory::evaluate_cuts_post_analyzers(CutManager& manager, const Produ
         }
     }
 }
+*/

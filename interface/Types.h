@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <Math/Vector4D.h>
-#include <cp3_llbb/HHAnalysis/interface/Indices.h>
+#include <cp3_llbb/HtoZAAnalysis/interface/Indices.h>
 
-namespace HH {
+namespace HtoZA {
     typedef ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<float>> LorentzVector;
 
     struct Lepton {
@@ -38,8 +38,8 @@ namespace HH {
         LorentzVector p4;
         LorentzVector gen_p4;
         std::pair<int, int> idxs; // indices in the corresponding framework collection
-        int ilep1; // index in the HH::Lepton collection
-        int ilep2; // index in the HH::Lepton collection
+        int ilep1; // index in the HtoZA::Lepton collection
+        int ilep2; // index in the HtoZA::Lepton collection
         std::pair<int8_t, int8_t> hlt_idxs = std::make_pair(-1,-1); // Stores indices of matched online objects. (-1,-1) if no match
         bool isOS; // Opposite Sign
         bool isPlusMinus;
@@ -84,6 +84,7 @@ namespace HH {
         float trigger_efficiency_downVariated;
         float trigger_efficiency_upVariated;
     };
+    /*
     struct Met {
         LorentzVector p4;
         LorentzVector gen_p4;
@@ -93,11 +94,13 @@ namespace HH {
         float gen_DPhi;
         float gen_DPtOverPt;
     };
+    */
+    /*
     struct DileptonMet : public Dilepton, public Met {
         LorentzVector p4;
         LorentzVector gen_p4;
-        int ill; // index in the HH::Dilepton collection
-        int imet; // index in the HH::Met collection
+        int ill; // index in the HtoZA::Dilepton collection
+        int imet; // index in the HtoZA::Met collection
         float DPhi_ll_met;
         float minDPhi_l_met;
         float maxDPhi_l_met;
@@ -109,6 +112,7 @@ namespace HH {
         float gen_DPhi;
         float gen_DPtOverPt;
     };
+    */
     struct Jet {
         LorentzVector p4;
         LorentzVector gen_p4;
@@ -135,7 +139,7 @@ namespace HH {
         LorentzVector p4;
         LorentzVector gen_p4;
         std::pair<int, int> idxs; // indices in the framework collection
-        int ijet1; // indices in the HH::Jet collection
+        int ijet1; // indices in the HtoZA::Jet collection
         int ijet2;
         //bool jid_LL;
         //bool jid_TT;
@@ -175,13 +179,12 @@ namespace HH {
         float psi;
     };
 
-    struct DileptonMetDijet : public DileptonMet, public Dijet {
+    struct DileptonDijet : public Dilepton, public Dijet {
         LorentzVector p4;
         LorentzVector lep1_p4;
         LorentzVector lep2_p4;
         LorentzVector jet1_p4;
         LorentzVector jet2_p4;
-        LorentzVector met_p4;
         LorentzVector ll_p4;
         LorentzVector jj_p4;
         LorentzVector lljj_p4;
@@ -191,21 +194,15 @@ namespace HH {
         LorentzVector gen_lep2_p4;
         LorentzVector gen_jet1_p4;
         LorentzVector gen_jet2_p4;
-        LorentzVector gen_met_p4;
         LorentzVector gen_ll_p4;
         LorentzVector gen_jj_p4;
         LorentzVector gen_lljj_p4;
-        //int illmet; // index in the HH::DileptonMet collection
-        //int ijj; // index in the HH::Dijet collection
-        float DPhi_jj_met;
-        float minDPhi_j_met;
-        float maxDPhi_j_met;
+        //int illmet; // index in the HtoZA::DileptonMet collection
+        //int ijj; // index in the HtoZA::Dijet collection
         float maxDR_l_j;
         float minDR_l_j;
         float DR_ll_jj;
         float DPhi_ll_jj;
-        float DR_llmet_jj;
-        float DPhi_llmet_jj;
         float cosThetaStar_CS;
         float MT_fullsystem;
         bool gen_matched;

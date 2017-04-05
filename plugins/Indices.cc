@@ -1,8 +1,8 @@
 #include <string>
 
-#include <cp3_llbb/HHAnalysis/interface/Indices.h>
+#include <cp3_llbb/HtoZAAnalysis/interface/Indices.h>
 
-namespace HHAnalysis {
+namespace HtoZAAnalysis {
   
   // Combination of lepton ID + lepton Isolation for a single lepton
   uint16_t lepIDIso(const lepID::lepID& id, const lepIso::lepIso& iso){

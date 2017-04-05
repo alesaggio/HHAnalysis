@@ -4,7 +4,7 @@
 #include <array>
 #include <string>
 
-namespace HHAnalysis {
+namespace HtoZAAnalysis {
   
   // lepton IDs
   namespace lepID {

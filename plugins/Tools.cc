@@ -1,10 +1,10 @@
-#include <cp3_llbb/HHAnalysis/interface/HHAnalyzer.h>
-#include <cp3_llbb/HHAnalysis/interface/Types.h>
+#include <cp3_llbb/HtoZAAnalysis/interface/HtoZAAnalyzer.h>
+#include <cp3_llbb/HtoZAAnalysis/interface/Types.h>
 #include <Math/Vector3D.h>
 
-#define HH_HLT_DEBUG (false)
+#define HtoZA_HLT_DEBUG (false)
 
-float HHAnalyzer::getCosThetaStar_CS(const LorentzVector & h1, const LorentzVector & h2, float ebeam /*= 6500*/) {
+float HtoZAAnalyzer::getCosThetaStar_CS(const LorentzVector & h1, const LorentzVector & h2, float ebeam /*= 6500*/) {
     // cos theta star angle in the Collins Soper frame
     LorentzVector p1, p2;
     p1.SetPxPyPzE(0, 0,  ebeam, ebeam);
@@ -20,7 +20,7 @@ float HHAnalyzer::getCosThetaStar_CS(const LorentzVector & h1, const LorentzVect
     return cos(ROOT::Math::VectorUtil::Angle(CSaxis.Unit(), newh1.Vect().Unit()));
 }
 
-MELAAngles HHAnalyzer::getMELAAngles(const LorentzVector &q1, const LorentzVector &q2, const LorentzVector &q11, const LorentzVector &q12, const LorentzVector &q21, const LorentzVector &q22, float ebeam /*= 6500*/) {
+MELAAngles HtoZAAnalyzer::getMELAAngles(const LorentzVector &q1, const LorentzVector &q2, const LorentzVector &q11, const LorentzVector &q12, const LorentzVector &q21, const LorentzVector &q22, float ebeam /*= 6500*/) {
     MELAAngles angles;
     LorentzVector p1, p2;
     p1.SetPxPyPzE(0, 0,  ebeam, ebeam);
@@ -74,14 +74,14 @@ MELAAngles HHAnalyzer::getMELAAngles(const LorentzVector &q1, const LorentzVecto
     return angles;
 }
 
-void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilepton) {
+void HtoZAAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HtoZA::Dilepton& dilepton) {
 
     if (leptons[dilepton.ilep1].hlt_already_tried_matching && leptons[dilepton.ilep2].hlt_already_tried_matching) {
-        if (HH_HLT_DEBUG) std::cout << "The HLT matching for this lepton pair has already been attempted, stopping here" << std::endl;
+        if (HtoZA_HLT_DEBUG) std::cout << "The HLT matching for this lepton pair has already been attempted, stopping here" << std::endl;
         return;
     }
 
-    if (HH_HLT_DEBUG) {
+    if (HtoZA_HLT_DEBUG) {
         std::cout << "Trying to match offline leptons " << dilepton.ilep1 << " and " << dilepton.ilep2 << " (there is " << hlt.object_p4.size() << " candidate HLT objects): " << std::endl;
         std::cout   << "\tlepton1: " << (leptons[dilepton.ilep1].isMu ? "muon" : "electron")
             << " ; Pt: " << leptons[dilepton.ilep1].p4.Pt() 
@@ -104,7 +104,7 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
         float l2_dr = ROOT::Math::VectorUtil::DeltaR(leptons[dilepton.ilep2].p4, hlt.object_p4[hlt_object]);
         float l1_dpt_over_pt = fabs(leptons[dilepton.ilep1].p4.Pt() - hlt.object_p4[hlt_object].Pt()) / leptons[dilepton.ilep1].p4.Pt();
         float l2_dpt_over_pt = fabs(leptons[dilepton.ilep2].p4.Pt() - hlt.object_p4[hlt_object].Pt()) / leptons[dilepton.ilep2].p4.Pt();
-        if (HH_HLT_DEBUG && false) { // quite verbose even for debugging
+        if (HtoZA_HLT_DEBUG && false) { // quite verbose even for debugging
                 int8_t index = hlt_object;
                 for (auto &path: hlt.object_paths[index])
                     std::cout << "\t# HLT path # " << +index << "\t" << path << std::endl;
@@ -142,13 +142,13 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
     if (l1_all_indices.empty()) {
         leptons[dilepton.ilep1].hlt_idx = -1;
         leptons[dilepton.ilep1].hlt_already_tried_matching = true;
-        if (HH_HLT_DEBUG)
+        if (HtoZA_HLT_DEBUG)
             std::cout << "\033[31mNo match found for first lepton\033[00m" << std::endl;
     }
     if (l2_all_indices.empty()) {
         leptons[dilepton.ilep2].hlt_idx = -1;
         leptons[dilepton.ilep2].hlt_already_tried_matching = true;
-        if (HH_HLT_DEBUG)
+        if (HtoZA_HLT_DEBUG)
             std::cout << "\033[31mNo match found for second lepton\033[00m" << std::endl;
     }
     // Check that the hlt path name is the same for both legs
@@ -171,7 +171,7 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
         }
     }
     if (l1_samepath_indices.empty()) {
-        if (HH_HLT_DEBUG)
+        if (HtoZA_HLT_DEBUG)
             std::cout << "\033[31mNo common HLT name match for the two leptons\033[00m" << std::endl;
         leptons[dilepton.ilep1].hlt_idx = -1;
         leptons[dilepton.ilep1].hlt_already_tried_matching = true;
@@ -214,14 +214,14 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
         if (leptons[dilepton.ilep1].isMu && leptons[dilepton.ilep2].isMu) {
             // di-muon filters: from the path name the legs can have asymetric cuts, taken filters from 
             // https://github.com/cms-analysis/MuonAnalysis-TagAndProbe/blob/fa1f8f3d469a5a78754ed4b4c43adbfad39a2544/python/common_variables_cff.py#L253-L264
-            if (HH_HLT_DEBUG) std::cout << "\tfinding dilepton legs: di-muon" << std::endl;
+            if (HtoZA_HLT_DEBUG) std::cout << "\tfinding dilepton legs: di-muon" << std::endl;
             filter_leg1.push_back("hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17");
             filter_leg1.push_back("hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17");
             filter_leg2.push_back("hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8");
             filter_leg2.push_back("hltDiMuonGlbFiltered17TrkFiltered8");
             filter_leg2.push_back("hltL2pfL1sDoubleMu114ORDoubleMu125L1f0L2PreFiltered0");
         } else {
-            if (HH_HLT_DEBUG) std::cout << "\tfinding dilepton legs: di-electron" << std::endl;
+            if (HtoZA_HLT_DEBUG) std::cout << "\tfinding dilepton legs: di-electron" << std::endl;
             filter_leg1.push_back("hltEle17Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter");
             filter_leg1.push_back("hltEle23Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg1Filter");
             filter_leg2.push_back("hltEle17Ele12CaloIdLTrackIdLIsoVLTrackIsoLeg2Filter");
@@ -237,7 +237,7 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
         || (leptons[dilepton.ilep1].isMu && leptons[dilepton.ilep2].isEl)) {
         // if the two offline objects are matching the same different flavour HLT path
         // then the leg1 and leg2 assignment is in sync with the order of the path name itself
-        if (HH_HLT_DEBUG) std::cout << "\tfinding dilepton legs: different flavour" << std::endl;
+        if (HtoZA_HLT_DEBUG) std::cout << "\tfinding dilepton legs: different flavour" << std::endl;
 
         // Leg 1 is alway mu, and leg 2 always electron
         leptons[dilepton.ilep1].hlt_leg1 = leptons[dilepton.ilep1].isMu;
@@ -247,7 +247,7 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
         leptons[dilepton.ilep2].hlt_leg2 = !leptons[dilepton.ilep1].hlt_leg2;
     }
 
-    if (HH_HLT_DEBUG) {
+    if (HtoZA_HLT_DEBUG) {
         std::cout << "\tLeg matching (before solving ambiguities):" << std::endl;
         std::cout << "\t    Lepton 1:" << std::endl;
         std::cout << "\t        Leg 1: " << std::boolalpha << leptons[dilepton.ilep1].hlt_leg1 << std::endl;
@@ -293,12 +293,12 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
 
     // Solve ambiguities, if any
     if (!(leptons[dilepton.ilep1].hlt_leg1 && leptons[dilepton.ilep2].hlt_leg1)) {
-        if (HH_HLT_DEBUG) std::cout << "\033[32mNo ambiguities! lucky day!" << std::endl;
+        if (HtoZA_HLT_DEBUG) std::cout << "\033[32mNo ambiguities! lucky day!" << std::endl;
         // let's set booleans clearly so that there remains only one leg1 and one leg2
         leptons[dilepton.ilep1].hlt_leg2 = leptons[dilepton.ilep1].hlt_leg1 ? false : true;
         leptons[dilepton.ilep2].hlt_leg2 = leptons[dilepton.ilep2].hlt_leg1 ? false : true;
     } else {
-        if (HH_HLT_DEBUG) std::cout << "\033[33mOh, both leptons are 'leg1', so let's say the 'real' leg 1 is the one with highest hlt-object pt" << std::endl;
+        if (HtoZA_HLT_DEBUG) std::cout << "\033[33mOh, both leptons are 'leg1', so let's say the 'real' leg 1 is the one with highest hlt-object pt" << std::endl;
         if (hlt.object_p4[leptons[dilepton.ilep1].hlt_idx].Pt() > hlt.object_p4[leptons[dilepton.ilep2].hlt_idx].Pt()) {
             leptons[dilepton.ilep1].hlt_leg1 = true; leptons[dilepton.ilep1].hlt_leg2 = false;
             leptons[dilepton.ilep2].hlt_leg1 = false; leptons[dilepton.ilep2].hlt_leg2 = true;
@@ -307,7 +307,7 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
             leptons[dilepton.ilep2].hlt_leg1 = true; leptons[dilepton.ilep2].hlt_leg2 = false;
         }
     }
-    if (HH_HLT_DEBUG) {
+    if (HtoZA_HLT_DEBUG) {
         index = leptons[dilepton.ilep1].hlt_idx;
         std::cout << "\033[32mLepton 1 is leg " << (leptons[dilepton.ilep1].hlt_leg1 ? 1 : 2) << " and matched with online object:\033[00m" << std::endl;
         std::cout << "\tHLT paths:" << std::endl;
@@ -339,25 +339,25 @@ void HHAnalyzer::matchOfflineLepton(const HLTProducer& hlt, HH::Dilepton& dilept
     }
 }
 
-float HHAnalyzer::getL1TPhi(int charge, const LorentzVector& p) {
+float HtoZAAnalyzer::getL1TPhi(int charge, const LorentzVector& p) {
     float pt = p.Pt();
     float theta = 180 / M_PI * p.Theta();
     theta = ( theta <= 90 ) ? theta : 180 - theta;
     return p.Phi() + M_PI / 180 * charge * (1. / pt) * (10.48 - 5.1412 * theta + 0.02308 * theta * theta);
 }
 
-bool HHAnalyzer::sameEndCap(const LorentzVector& p1, const LorentzVector& p2) {
+bool HtoZAAnalyzer::sameEndCap(const LorentzVector& p1, const LorentzVector& p2) {
     return p1.Eta() * p2.Eta() > 0 && std::abs(p1.Eta()) > 1.24 && std::abs(p2.Eta()) > 1.24;
 }
 
-float HHAnalyzer::translatePhi(float phi, float translation/*=0*/) {
+float HtoZAAnalyzer::translatePhi(float phi, float translation/*=0*/) {
     phi += translation; // translate
     phi = std::fmod(phi, 2 * M_PI); // put between -2pi, 2pi
     phi = (phi > 0) ? phi : (2 * M_PI + phi); // put between 0, 2pi
     return phi;
 }
 
-int HHAnalyzer::getPhiSector(float phi, float start, float end) {
+int HtoZAAnalyzer::getPhiSector(float phi, float start, float end) {
     for (int i = 0; i < 6; i++) {
         if (start + i * M_PI / 3 <= phi && phi < end + i * M_PI / 3)
             return i;
@@ -365,7 +365,7 @@ int HHAnalyzer::getPhiSector(float phi, float start, float end) {
     return -1;
 }
 
-bool HHAnalyzer::isCSCSameSector(const Lepton& lep1, const Lepton& lep2) {
+bool HtoZAAnalyzer::isCSCSameSector(const Lepton& lep1, const Lepton& lep2) {
     if (!sameEndCap(lep1.p4, lep2.p4))
         return false;
 
@@ -387,7 +387,7 @@ bool HHAnalyzer::isCSCSameSector(const Lepton& lep1, const Lepton& lep2) {
     return false;
 }
 
-bool HHAnalyzer::isCSCWithOverlap(const Lepton& lep1, const Lepton& lep2) {
+bool HtoZAAnalyzer::isCSCWithOverlap(const Lepton& lep1, const Lepton& lep2) {
     if (!sameEndCap(lep1.p4, lep2.p4))
         return false;
 
@@ -409,7 +409,7 @@ bool HHAnalyzer::isCSCWithOverlap(const Lepton& lep1, const Lepton& lep2) {
     return false;
 }
 
-void HHAnalyzer::fillTriggerEfficiencies(const Lepton & lep1, const Lepton & lep2, Dilepton & dilep) {
+void HtoZAAnalyzer::fillTriggerEfficiencies(const Lepton & lep1, const Lepton & lep2, Dilepton & dilep) {
 
     float eff_lep1_leg1 = 1.;
     float eff_lep1_leg2 = 1.;

@@ -1,16 +1,16 @@
-#ifndef HH_CATEGORIES_H
-#define HH_CATEGORIES_H
+#ifndef HtoZA_CATEGORIES_H
+#define HtoZA_CATEGORIES_H
 
 #include <cp3_llbb/Framework/interface/Category.h>
-#include <cp3_llbb/HHAnalysis/interface/HHAnalyzer.h>
+#include <cp3_llbb/HtoZAAnalysis/interface/HtoZAAnalyzer.h>
 
 class DileptonCategory: public Category {
     public:
-        const std::vector<HH::Lepton>& getLeptons(const AnalyzersManager& analyzers) const ;
-        const std::vector<HH::Dilepton>& getDileptons(const AnalyzersManager& analyzers) const ;
-        const std::vector<HH::DileptonMetDijet>& getDileptonMetDijets(const AnalyzersManager& analyzers) const ;
+        const std::vector<HtoZA::Lepton>& getLeptons(const AnalyzersManager& analyzers) const ;
+        const std::vector<HtoZA::Dilepton>& getDileptons(const AnalyzersManager& analyzers) const ;
+        const std::vector<HtoZA::DileptonDijet>& getDileptonDijets(const AnalyzersManager& analyzers) const ;
         virtual void configure(const edm::ParameterSet& conf) override {
-            m_analyzer_name = conf.getUntrackedParameter<std::string>("m_analyzer_name", "hh_analyzer");
+            m_analyzer_name = conf.getUntrackedParameter<std::string>("m_analyzer_name", "hZA_analyzer");
         }
     private:
         std::string m_analyzer_name;
